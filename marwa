@@ -1,0 +1,50 @@
+import java.util.logging.Logger;
+
+
+public class MA implements Runnable
+{
+    public void run ()
+    {
+        try
+        {
+            String host="jdbc:derby://localhost:1527/MA on M";
+            String un="MA";
+            String pass="MA";
+            Connection con=DriverManager.getConnection(host, un, pass);
+            ServerSocket aa = new ServerSocket(6000);
+            System.out.println("Connection is ready");
+            
+            while(true)
+ {
+                Socket ms=aa.accept();
+                DataInputStream dis =new DataInputStream(ms.getInputStream());
+                int code =dis.readInt();
+                double numc = dis.readDouble();
+                System.out.println("code"+code);
+                System.out.println("number of cups"+numc);
+                
+                DataOutputStream dos =new DataOutputStream(ms.getOutputStream());
+                double tp =0;
+                dos.writeDouble(tp);
+                double worth =0;
+                dos.writeDouble(worth);
+                
+                Statement smt= con.createStatement();
+                String getvals=("select*from code"+code);
+                smt.execute(un);
+ResultSet rs=smt.getResultSet();
+                
+                if(rs.next())
+                {
+                    double temp_pnt =rs.getDouble("code");
+                    double temp_m_val = rs.getDouble("price");
+                    double r1=temp_pnt+tp;
+                    double r2 =temp_m_val+worth;
+                    dos.writeDouble(r1);
+                    dos.writeDouble(r2);
+                    
+                    
+                }
+                dos.flush();
+                dos.close();
+}
